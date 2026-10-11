@@ -1,6 +1,7 @@
 import time
 import os
 import sqlite3
+import textwrap
 from datetime import datetime, timedelta
 import pandas as pd
 import plotly.express as px
@@ -313,7 +314,7 @@ c1, c2, c3, c4, c5 = st.columns(5)
 with c1:
     badge = "badge-healthy" if n1_cpu < 80.0 and n1_status != "OFFLINE" else "badge-overload"
     c_dot = "#2E6B4B" if n1_cpu < 80.0 and n1_status != "OFFLINE" else "#B24330"
-    st.markdown(f"""
+    card_html = f"""
     <div class="metric-card">
         <div class="metric-title">Node 1 (Port 5001)</div>
         <div class="metric-value">{n1_cpu:.1f}%</div>
@@ -322,12 +323,13 @@ with c1:
             <span style="font-size: 12px; color: #718096; margin-left: 6px;">RAM: {n1_mem:.0f}%</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown("\n".join(line.strip() for line in textwrap.dedent(card_html).splitlines() if line.strip()), unsafe_allow_html=True)
 
 with c2:
     badge = "badge-healthy" if n2_cpu < 80.0 and n2_status != "OFFLINE" else "badge-overload"
     c_dot = "#2E6B4B" if n2_cpu < 80.0 and n2_status != "OFFLINE" else "#B24330"
-    st.markdown(f"""
+    card_html = f"""
     <div class="metric-card">
         <div class="metric-title">Node 2 (Port 5002)</div>
         <div class="metric-value">{n2_cpu:.1f}%</div>
@@ -336,10 +338,11 @@ with c2:
             <span style="font-size: 12px; color: #718096; margin-left: 6px;">RAM: {n2_mem:.0f}%</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown("\n".join(line.strip() for line in textwrap.dedent(card_html).splitlines() if line.strip()), unsafe_allow_html=True)
 
 with c3:
-    st.markdown(f"""
+    card_html = f"""
     <div class="metric-card">
         <div class="metric-title">Active Routing Policy</div>
         <div style="font-size: 18px; font-weight: 700; color: #1A202C; margin-top: 4px; line-height: 1.3;">
@@ -349,10 +352,11 @@ with c3:
             <span class="badge-neutral">{icon_dot('#3B5A79')} Proxy :8000</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown("\n".join(line.strip() for line in textwrap.dedent(card_html).splitlines() if line.strip()), unsafe_allow_html=True)
 
 with c4:
-    st.markdown(f"""
+    card_html = f"""
     <div class="metric-card">
         <div class="metric-title">Recent Routed Requests</div>
         <div class="metric-value">{total_recent_requests}</div>
@@ -360,12 +364,13 @@ with c4:
             <span class="badge-neutral">{icon_dot('#3B5A79')} Past 2 Mins</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown("\n".join(line.strip() for line in textwrap.dedent(card_html).splitlines() if line.strip()), unsafe_allow_html=True)
 
 with c5:
     penalty_badge = "badge-healthy" if sla_penalty_cost == 0 else "badge-overload"
     p_dot = "#2E6B4B" if sla_penalty_cost == 0 else "#B24330"
-    st.markdown(f"""
+    card_html = f"""
     <div class="metric-card">
         <div class="metric-title">SLA Penalty Incurred</div>
         <div class="metric-value">${sla_penalty_cost:.2f}</div>
@@ -373,7 +378,8 @@ with c5:
             <span class="{penalty_badge}">{icon_dot(p_dot)} {sla_violations} Breaches</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown("\n".join(line.strip() for line in textwrap.dedent(card_html).splitlines() if line.strip()), unsafe_allow_html=True)
 
 st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
 
@@ -541,55 +547,60 @@ with tab_architecture:
     n2_status_indicator = f"{icon_check_circle(14, '#2E6B4B')} ACTIVE (Receiving Traffic)" if (n2_cpu < 80.0) else f"{icon_alert_triangle(14, '#B24330')} SHUNTED (Traffic Diverted)"
 
     topo_html = f"""
-    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #FFFFFF; padding: 24px; border-radius: 12px; border: 1px solid #EAEAEA;">
-        <!-- Client -->
-        <div style="flex: 1; text-align: center; background: #F8F9FA; border: 1px solid #E2E8F0; padding: 18px; border-radius: 8px;">
-            <div style="margin-bottom: 6px;">{icon_clients(28, '#5B7083')}</div>
-            <div style="font-weight: 700; color: #2D3748;">User Clients</div>
-            <div style="font-size: 12px; color: #718096; margin-top: 2px;">HTTP Ingress</div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #FFFFFF; padding: 24px; border-radius: 12px; border: 1px solid #EAEAEA; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
+        <div style="flex: 1; text-align: center; background: #F8F9FA; border: 1px solid #E2E8F0; padding: 20px 14px; border-radius: 10px;">
+            <div style="margin-bottom: 8px;">{icon_clients(30, '#5B7083')}</div>
+            <div style="font-weight: 700; color: #1E293B; font-size: 15px;">User Clients</div>
+            <div style="margin-top: 6px;"><span class="badge-neutral" style="font-size: 11px;">HTTP Ingress</span></div>
         </div>
 
-        <div>{icon_arrow_right(20, '#A0AEC0')}</div>
-
-        <!-- Load Balancer -->
-        <div style="flex: 1.5; text-align: center; background: #F0F4F8; border: 1px solid #D0DFEE; padding: 18px; border-radius: 8px;">
-            <div style="margin-bottom: 6px;">{icon_balancer(28, '#4A6B82')}</div>
-            <div style="font-weight: 700; color: #2B4C6F;">Metric-Aware Load Balancer</div>
-            <div style="font-size: 12px; color: #4A6B82; margin-top: 2px;">Port 8000 | Mode: <strong>{routing_mode}</strong></div>
+        <div style="display: flex; align-items: center; justify-content: center; padding: 0 6px;">
+            {icon_arrow_right(22, '#A0AEC0')}
         </div>
 
-        <div>{icon_arrow_right(20, '#A0AEC0')}</div>
+        <div style="flex: 1.4; text-align: center; background: #F0F4F8; border: 1px solid #D0DFEE; padding: 20px 14px; border-radius: 10px;">
+            <div style="margin-bottom: 8px;">{icon_balancer(30, '#4A6B82')}</div>
+            <div style="font-weight: 700; color: #1E293B; font-size: 15px;">Metric-Aware Load Balancer</div>
+            <div style="font-size: 12px; color: #4A6B82; margin-top: 4px;">Port 8000</div>
+            <div style="margin-top: 8px;"><span class="{routing_badge_class}" style="font-size: 11px;">{icon_dot(dot_color)} {routing_mode}</span></div>
+        </div>
 
-        <!-- Nodes Stack -->
-        <div style="flex: 2; display: flex; flex-direction: column; gap: 12px;">
-            <div style="background: {n1_color}; border: 1px solid {n1_border}; padding: 14px 18px; border-radius: 8px;">
+        <div style="display: flex; flex-direction: column; justify-content: space-around; gap: 42px; padding: 0 6px;">
+            <div style="display: flex; align-items: center; justify-content: center;" title="Branch to Node 1">{icon_arrow_right(20, '#A0AEC0')}</div>
+            <div style="display: flex; align-items: center; justify-content: center;" title="Branch to Node 2">{icon_arrow_right(20, '#A0AEC0')}</div>
+        </div>
+
+        <div style="flex: 2; display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: {n1_color}; border: 1px solid {n1_border}; padding: 14px 18px; border-radius: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 700; color: #2D3748;">Node 1 (:5001)</span>
-                    <span style="font-size: 12px; font-weight: 600;">{n1_cpu:.1f}% CPU</span>
+                    <span style="font-weight: 700; color: #1E293B; font-size: 14px;">Node 1 (:5001)</span>
+                    <span style="font-size: 12px; font-weight: 600; color: #4A5568;">{n1_cpu:.1f}% CPU</span>
                 </div>
-                <div style="font-size: 12px; color: #4A5568; margin-top: 4px; display: flex; align-items: center;">{n1_status_indicator}</div>
+                <div style="margin-top: 6px;">{n1_status_indicator}</div>
             </div>
 
-            <div style="background: {n2_color}; border: 1px solid {n2_border}; padding: 14px 18px; border-radius: 8px;">
+            <div style="background: {n2_color}; border: 1px solid {n2_border}; padding: 14px 18px; border-radius: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 700; color: #2D3748;">Node 2 (:5002)</span>
-                    <span style="font-size: 12px; font-weight: 600;">{n2_cpu:.1f}% CPU</span>
+                    <span style="font-weight: 700; color: #1E293B; font-size: 14px;">Node 2 (:5002)</span>
+                    <span style="font-size: 12px; font-weight: 600; color: #4A5568;">{n2_cpu:.1f}% CPU</span>
                 </div>
-                <div style="font-size: 12px; color: #4A5568; margin-top: 4px; display: flex; align-items: center;">{n2_status_indicator}</div>
+                <div style="margin-top: 6px;">{n2_status_indicator}</div>
             </div>
         </div>
     </div>
     """
-    st.markdown(topo_html, unsafe_allow_html=True)
+    rendered_html = "\n".join(line.strip() for line in textwrap.dedent(topo_html).splitlines() if line.strip())
+    st.markdown(rendered_html, unsafe_allow_html=True)
 
     st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
-    st.markdown("""
+    algo_text = textwrap.dedent("""
     **Self-Healing Algorithm Explained:**
     1. **Telemetry Ingestion**: Worker nodes report real-time CPU, RAM, and hardware metrics every second to the shared SQLite state bus.
     2. **Anomaly Detection**: If node CPU crosses 80.0%, the monitoring agent fires a debounced alert incident.
     3. **Dynamic Proxy Routing**: The Load Balancer queries the shared state before routing. Overloaded nodes are immediately bypassed in favor of healthy nodes.
     4. **Zero Dropped Requests**: If a primary target becomes completely unresponsive during transit, the proxy automatically falls back to an alternate node.
-    """)
+    """).strip()
+    st.markdown(algo_text)
 
 # --- TAB 4: Anomaly Log & Webhooks ---
 with tab_incidents:
