@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  node-1:
+    build: .
+    container_name: telemetry_node_1
+    command: python app_node.py node-1 5001
+    ports:
+      - "5001:5001"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  node-2:
+    build: .
+    container_name: telemetry_node_2
+    command: python app_node.py node-2 5002
+    ports:
+      - "5002:5002"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  load-balancer:
+    build: .
+    container_name: telemetry_load_balancer
+    command: python load_balancer.py
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - node-1
+      - node-2
+    restart: unless-stopped
+
+  telemetry-agent:
+    build: .
+    container_name: telemetry_agent
+    command: python agent.py
+    volumes:
+      - .:/app
+    depends_on:
+      - node-1
+      - node-2
+    restart: unless-stopped
+
+  dashboard:
+    build: .
+    container_name: telemetry_dashboard
+    command: streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - load-balancer
+      - telemetry-agent
+    restart: unless-stopped

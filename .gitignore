@@ -1,0 +1,23 @@
+# Python virtual environment
+.venv/
+venv/
+ENV/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# SQLite local telemetry state database
+cloud_telemetry.db
+cloud_telemetry.db-wal
+cloud_telemetry.db-shm
+
+# OS & IDE artifacts
+.DS_Store
+.idea/
+.vscode/
+
+# Streamlit temporary data
+.streamlit/secrets.toml
